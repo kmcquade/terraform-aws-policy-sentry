@@ -4,7 +4,7 @@ Builds secure IAM Policies with resource constraints. For more information on Po
 
 ## Requirements
 
-* You must have Policy Sentry installed beforehand and it must be executable from your `$PATH`. Follow the installation instructions [here](https://policy-sentry.readthedocs.io/en/latest/user-guide/installation.html)
+* You must have Policy Sentry (at least version 0.7.0.2) installed beforehand and it must be executable from your `$PATH`. Follow the installation instructions [here](https://policy-sentry.readthedocs.io/en/latest/user-guide/installation.html)
 
 * You will have to run `terraform apply` **twice**. See the instructions for more details.
 
