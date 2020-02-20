@@ -4,7 +4,7 @@ Builds secure IAM Policies with resource constraints. For more information on Po
 
 ## Requirements
 
-* You must have Policy Sentry (at least version 0.7.0.2) installed beforehand and it must be executable from your `$PATH`. Follow the installation instructions [here](https://policy-sentry.readthedocs.io/en/latest/user-guide/installation.html)
+* You must have Policy Sentry 0.7.1 installed beforehand and it must be executable from your `$PATH`. Follow the installation instructions [here](https://policy-sentry.readthedocs.io/en/latest/user-guide/installation.html)
 
 * You will have to run `terraform apply` **twice**. See the instructions for more details.
 
@@ -25,7 +25,7 @@ module "policy_sentry_demo" {
   list_access_level                   = var.list_access_level
   tagging_access_level                = var.tagging_access_level
   permissions_management_access_level = var.permissions_management_access_level
-  wildcard_only_actions               = var.wildcard_only_actions
+  wildcard_only_single_actions               = var.wildcard_only_actions
   minimize                            = var.minimize
 }
 ```
@@ -54,13 +54,16 @@ write_access_level = [
 
 * Run `terraform apply` once to create the JSON policy file.
 
-![](https://i.imgur.com/dn80hE0.gif)
+![](https://raw.githubusercontent.com/kmcquade/terraform-aws-policy-sentry/master/docs/asciinema/policy-sentry-terraform-1.gif)
 
 * Run `terraform apply` **again** to create the IAM policy
 
-![](https://i.imgur.com/ndIXTQb.gif)
+![](https://raw.githubusercontent.com/kmcquade/terraform-aws-policy-sentry/master/docs/asciinema/policy-sentry-terraform-2.gif)
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Providers
+
+No provider.
 
 ## Inputs
 
@@ -75,7 +78,12 @@ write_access_level = [
 | read\_access\_level | Provide a list of Amazon Resource Names (ARNs) that your role needs READ access to. | `list` | <pre>[<br>  ""<br>]</pre> | no |
 | region | The AWS region for these resources. Defaults to us-east-1 | `string` | `"us-east-1"` | no |
 | tagging\_access\_level | Provide a list of Amazon Resource Names (ARNs) that your role needs TAGGING access to. | `list` | <pre>[<br>  ""<br>]</pre> | no |
-| wildcard\_only\_actions | Only actions that do not support resource constraints | `list` | <pre>[<br>  ""<br>]</pre> | no |
+| wildcard\_only\_list\_service | To generate a list of AWS service actions that (1) are at the LIST access level and (2) do not support resource constraints, list the service prefix here. | `list` | <pre>[<br>  ""<br>]</pre> | no |
+| wildcard\_only\_permissions\_management\_service | To generate a list of AWS service actions that (1) are at the PERMISSIONS MANAGEMENT access level and (2) do not support resource constraints, list the service prefix here. | `list` | <pre>[<br>  ""<br>]</pre> | no |
+| wildcard\_only\_read\_service | To generate a list of AWS service actions that (1) are at the READ access level and (2) do not support resource constraints, list the service prefix here. | `list` | <pre>[<br>  ""<br>]</pre> | no |
+| wildcard\_only\_single\_actions | Individual actions that do not support resource constraints. For example, s3:ListAllMyBuckets | `list` | <pre>[<br>  ""<br>]</pre> | no |
+| wildcard\_only\_tagging\_service | To generate a list of AWS service actions that (1) are at the TAGGING access level and (2) do not support resource constraints, list the service prefix here. | `list` | <pre>[<br>  ""<br>]</pre> | no |
+| wildcard\_only\_write\_service | To generate a list of AWS service actions that (1) are at the WRITE access level and (2) do not support resource constraints, list the service prefix here. | `list` | <pre>[<br>  ""<br>]</pre> | no |
 | write\_access\_level | Provide a list of Amazon Resource Names (ARNs) that your role needs WRITE access to. | `list` | <pre>[<br>  ""<br>]</pre> | no |
 
 ## Outputs
