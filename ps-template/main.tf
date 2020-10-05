@@ -3,6 +3,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 locals {
+  file = "${var.name}.json"
   policy_sentry_template = {
     "mode" : "crud",
     "read" : var.read_access_level,
@@ -24,10 +25,15 @@ locals {
   minimize          = var.minimize ? "--minimize 0" : ""
 }
 
+resource "local_file" "template" {
+  filename =  "template.json"
+  content = local.rendered_template
+}
+
 resource "null_resource" "command" {
   # Just creating a unique string so that when the long unique string changes, the command will be run again.
   triggers = {
-    file = "${var.name}.json"
+    file = local.file
     policy_sentry_template = join(",", concat(
       var.read_access_level,
       var.write_access_level,
@@ -49,7 +55,8 @@ resource "null_resource" "command" {
     # If the json file exists from a previous run, delete it first.
     # command = "[ ! -e ${self.triggers.file} ] || rm ${self.triggers.file} && echo '${local.rendered_template}' | policy_sentry write-policy ${local.minimize} > ${self.triggers.file}"
     # Render the template as JSON and ingest via stdin
-    command = "echo '${local.rendered_template}' | policy_sentry write-policy ${local.minimize} > ${self.triggers.file}"
+    #command = "echo '${local.rendered_template}' | policy_sentry write-policy ${local.minimize} > ${self.triggers.file}"
+    command = "policy_sentry write-policy --input-file ${local_file.template.filename} ${local.minimize} > ${self.triggers.file}"
   }
 
   provisioner "local-exec" {
@@ -57,3 +64,9 @@ resource "null_resource" "command" {
     when    = destroy
   }
 }
+
+data "local_file" "policy" {
+  depends_on = [ null_resource.command ]
+  filename = local.file
+}
+
