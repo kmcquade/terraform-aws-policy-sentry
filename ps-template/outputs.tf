@@ -8,8 +8,7 @@ output "policy_sentry_template_contents" {
   value       = local.rendered_template
 }
 
-# the policy needs to be base64 decoded from the external data source
 output "policy_json" {
   description = "The contents of the policy"
-  value       = base64decode(data.external.policy.result.base64)
+  value       = data.external.policy.result.policy
 }

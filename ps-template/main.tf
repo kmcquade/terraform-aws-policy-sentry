@@ -22,7 +22,7 @@ locals {
   }
   rendered_template = jsonencode(local.policy_sentry_template)
   decoded_template  = jsondecode(jsonencode(local.policy_sentry_template))
-  options           = var.minimize ? "--output-base64 --minimize 0" : "--output-base64"
+  minimize          = var.minimize ? "0" : "-1"
 }
 
 resource "local_file" "template" {
@@ -30,14 +30,10 @@ resource "local_file" "template" {
   content = local.rendered_template
 }
 
-# external data sources only support a simple json response of keyed strings
-# { "key1": "string1", "key2": "string2", ..., "keyN": "stringN" }
-#
-# i modified policy_sentry to work around this limitation
-# the --output-base64 option will output the policy as follows
-# { "base64": policy-as-base64-encoded-string }
-
 data "external" "policy" {
-  program = [ "policy_sentry", "write-policy", local.options, "--input-file", local_file.template.filename ]
+  program = [ "policy_sentry", "write-policy",
+              "--fmt", "terraform",                           # outputs { "policy": escaped-json-string }
+              "--minimize", local.minimize,                   # must be passed as parameter
+              "--input-file", local_file.template.filename ]
 }
 
