@@ -16,4 +16,5 @@ module "create_iam" {
   name          = var.name
   description   = var.description
   create_policy = var.create_policy
+  policy_json   = module.create_template.policy_json
 }

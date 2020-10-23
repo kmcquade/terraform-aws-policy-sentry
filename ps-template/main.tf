@@ -3,6 +3,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 locals {
+  file = "${var.name}.json"
   policy_sentry_template = {
     "mode" : "crud",
     "read" : var.read_access_level,
@@ -21,39 +22,18 @@ locals {
   }
   rendered_template = jsonencode(local.policy_sentry_template)
   decoded_template  = jsondecode(jsonencode(local.policy_sentry_template))
-  minimize          = var.minimize ? "--minimize 0" : ""
+  minimize          = var.minimize ? "0" : "-1"
 }
 
-resource "null_resource" "command" {
-  # Just creating a unique string so that when the long unique string changes, the command will be run again.
-  triggers = {
-    file = "${var.name}.json"
-    policy_sentry_template = join(",", concat(
-      var.read_access_level,
-      var.write_access_level,
-      var.list_access_level,
-      var.permissions_management_access_level,
-      var.tagging_access_level,
-      var.wildcard_only_single_actions,
-      var.wildcard_only_read_service,
-      var.wildcard_only_write_service,
-      var.wildcard_only_list_service,
-      var.wildcard_only_tagging_service,
-      var.wildcard_only_permissions_management_service,
-      list(var.name),
-      list(tostring(local.minimize))
-    ))
-  }
-
-  provisioner "local-exec" {
-    # If the json file exists from a previous run, delete it first.
-    # command = "[ ! -e ${self.triggers.file} ] || rm ${self.triggers.file} && echo '${local.rendered_template}' | policy_sentry write-policy ${local.minimize} > ${self.triggers.file}"
-    # Render the template as JSON and ingest via stdin
-    command = "echo '${local.rendered_template}' | policy_sentry write-policy ${local.minimize} > ${self.triggers.file}"
-  }
-
-  provisioner "local-exec" {
-    command = "[ ! -e ${self.triggers.file} ] || rm ${self.triggers.file}"
-    when    = destroy
-  }
+resource "local_file" "template" {
+  filename =  "template.json"
+  content = local.rendered_template
 }
+
+data "external" "policy" {
+  program = [ "policy_sentry", "write-policy",
+              "--fmt", "terraform",                           # outputs { "policy": escaped-json-string }
+              "--minimize", local.minimize,                   # must be passed as parameter
+              "--input-file", local_file.template.filename ]
+}
+

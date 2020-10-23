@@ -1,12 +1,12 @@
 # Takes the relative path to the .json policy; remove the folder name and the extension. This will be our policy name
 resource "aws_iam_policy" "policy" {
-  count       = var.create_policy && fileexists("${var.name}.json") ? 1 : 0
-  name        = replace("${var.name}.json", ".json", "")
+  name        = var.name
   path        = "/"
   description = var.description
-  policy      = data.template_file.dynamic_policy.rendered
+  policy      = data.aws_iam_policy_document.policy.json
 }
 
-data "template_file" "dynamic_policy" {
-  template = var.create_policy && fileexists("${var.name}.json") ? file("${var.name}.json") : ""
+data "aws_iam_policy_document" "policy" {
+  source_json = var.policy_json
 }
+
