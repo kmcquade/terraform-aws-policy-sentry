@@ -33,5 +33,6 @@ This generates the JSON policy file with Policy Sentry.
 |------|-------------|
 | file\_name | The path of the file. |
 | policy\_sentry\_template\_contents | The contents of the Policy Sentry template |
+| policy\_json | The rendered policy as json |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
