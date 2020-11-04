@@ -22,7 +22,8 @@ locals {
   }
   rendered_template = jsonencode(local.policy_sentry_template)
   decoded_template  = jsondecode(jsonencode(local.policy_sentry_template))
-  minimize          = var.minimize ? "0" : "-1"
+  policy_sentry     = [ "policy_sentry", "write-policy", "--fmt", "terraform" ]
+  command           = var.minimize ? concat(local.policy_sentry, [ "--minimize" ]) : local.policy_sentry
 }
 
 resource "local_file" "template" {
@@ -31,9 +32,6 @@ resource "local_file" "template" {
 }
 
 data "external" "policy" {
-  program = [ "policy_sentry", "write-policy",
-              "--fmt", "terraform",                           # outputs { "policy": escaped-json-string }
-              "--minimize", local.minimize,                   # must be passed as parameter
-              "--input-file", local_file.template.filename ]
+  program = concat(local.command, [ "--input-file", local_file.template.filename ])
 }
 

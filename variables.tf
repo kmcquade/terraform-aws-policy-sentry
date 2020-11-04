@@ -13,12 +13,6 @@ variable "region" {
   default     = "us-east-1"
 }
 
-variable "create_policy" {
-  description = "Set to true to create the actual IAM policies. Defaults to true."
-  default     = true
-  type        = bool
-}
-
 variable "minimize" {
   description = "If set to true, it will minimize the size of the IAM Policy file. Defaults to false."
   default     = false
